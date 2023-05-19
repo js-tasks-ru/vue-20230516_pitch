@@ -7,4 +7,7 @@
  */
 export function sum(a, b) {
   // Решение
+  a = a ? +a : 0
+  b = b ? +b : 0
+  return a + b
 }
