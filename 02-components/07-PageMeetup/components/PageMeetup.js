@@ -8,7 +8,7 @@ export default defineComponent({
   name: 'PageMeetup',
   data() {
     return {
-      meetup: {},
+      meetup: null,
       loading: true,
       errorLoadMeetup: true,
       errorMessage: '',

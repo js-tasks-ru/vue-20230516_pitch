@@ -17,9 +17,8 @@ const App = createApp({
   name: 'app',
   data(){
     return {
-      ArrayMeetupId: [1, 2, 3, 4, 5],
       selectedId: undefined,
-      meetup: {}
+      meetup: null
     }
   },
   watch:{
