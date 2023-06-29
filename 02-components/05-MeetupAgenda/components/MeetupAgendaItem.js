@@ -10,7 +10,7 @@ export default defineComponent({
     agendaItem: {
       required: true,
       type: Object,
-      default: () => {}
+      default: () => ({})
     }
   },
 

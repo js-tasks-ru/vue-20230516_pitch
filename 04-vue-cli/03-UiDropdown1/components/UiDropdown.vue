@@ -1,18 +1,40 @@
 <template>
-  <div class="dropdown dropdown_opened">
-    <button type="button" class="dropdown__toggle dropdown__toggle_icon">
-      <UiIcon icon="tv" class="dropdown__icon" />
-      <span>Title</span>
+  <div
+    class="dropdown"
+    :class="{'dropdown_opened': isOpen}"
+    @click="isOpen = !isOpen"
+  >
+    <button
+      type="button"
+      class="dropdown__toggle"
+      :class="{'dropdown__toggle_icon': iconPresent}"
+    >
+      <UiIcon
+        :icon="optionActive.icon"
+        class="dropdown__icon"
+        v-if="optionActive.icon"
+      />
+      <span>{{ optionActive.text }}</span>
     </button>
-
-    <div class="dropdown__menu" role="listbox">
-      <button class="dropdown__item dropdown__item_icon" role="option" type="button">
-        <UiIcon icon="tv" class="dropdown__icon" />
-        Option 1
-      </button>
-      <button class="dropdown__item dropdown__item_icon" role="option" type="button">
-        <UiIcon icon="tv" class="dropdown__icon" />
-        Option 2
+    <div
+      class="dropdown__menu"
+      role="listbox"
+      v-show="isOpen"
+    >
+      <button
+        class="dropdown__item"
+        :class="{'dropdown__item_icon': iconPresent}"
+        role="option"
+        type="button"
+        v-for="option in options"
+        @click="$emit('update:modelValue', option.value)"
+      >
+        <UiIcon
+          v-if="option.icon"
+          :icon="option.icon"
+          class="dropdown__icon"
+        />
+        {{ option.text }}
       </button>
     </div>
   </div>
@@ -24,7 +46,42 @@ import UiIcon from './UiIcon.vue';
 export default {
   name: 'UiDropdown',
 
-  components: { UiIcon },
+  components: {UiIcon},
+  props: {
+    options: {
+      required: true,
+      type: Array,
+    },
+    modelValue: {
+      type: String
+    },
+    title: {
+      required: true,
+      type: String
+    }
+  },
+  emits: ['update:modelValue'],
+  data() {
+    return {
+      isOpen: false
+    }
+  },
+  computed: {
+    iconPresent(){
+      return this.options.some(option => !!option.icon)
+    },
+    optionActive() {
+      if (this.options.map(option => option.value).includes(this.modelValue)) {
+        return this.options.find(option => option.value === this.modelValue)
+      } else {
+        return {
+          text: this.title,
+          icon: null
+        }
+      }
+
+    }
+  },
 };
 </script>
 

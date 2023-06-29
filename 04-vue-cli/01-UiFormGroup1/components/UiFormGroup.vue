@@ -1,14 +1,28 @@
 <template>
-  <div class="form-group">
-    <!-- form-group_inline -->
-    <label class="form-group__label">label text</label>
-    <!-- CONTENT -->
+  <div
+    :class="{'form-group_inline': inline}"
+    class="form-group"
+  >
+    <label v-if="!!label" class="form-group__label">{{ label }}</label>
+    <slot/>
   </div>
 </template>
 
 <script>
 export default {
   name: 'UiFormGroup',
+  props: {
+    inline: {
+      required: false,
+      type: Boolean,
+      default: () => false
+    },
+    label: {
+      required: false,
+      type: String,
+      default: () => ''
+    },
+  }
 };
 </script>
 
