@@ -3,6 +3,7 @@
     :is="tag"
     class="button"
     :class="[classForButton, {'button_block': block}]"
+    :[type]="'button'"
   >
     <slot/>
   </component>
@@ -13,7 +14,7 @@ export default {
   name: 'UiButton',
   props: {
     tag: {
-      type: String,
+      type: [String, Object],
       required: false,
       default: 'button'
     },
@@ -32,6 +33,9 @@ export default {
   computed: {
     classForButton() {
       return `button_${this.variant}`
+    },
+    type() {
+      return this.tag === 'button' ? 'type' : null
     }
   }
 };
