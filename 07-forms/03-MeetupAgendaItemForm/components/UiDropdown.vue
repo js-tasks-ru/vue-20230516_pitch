@@ -1,42 +1,28 @@
 <template>
-  <div
-    class="dropdown"
-    :class="{'dropdown_opened': isOpen}"
-    @click="isOpen = !isOpen"
-  >
-    <button
-      type="button"
-      class="dropdown__toggle"
-      :class="{'dropdown__toggle_icon': iconPresent}"
-    >
-      <UiIcon
-        :icon="optionActive.icon"
-        class="dropdown__icon"
-        v-if="optionActive.icon"
-      />
-      <span>{{ optionActive.text }}</span>
+  <div class="dropdown" :class="{ dropdown_opened: isOpen }">
+    <button type="button" class="dropdown__toggle" :class="{ dropdown__toggle_icon: hasIcons }" @click="toggleOpen">
+      <UiIcon v-if="selected?.icon" :icon="selected.icon" class="dropdown__icon" />
+      <span>{{ modelValue !== undefined ? selected?.text : title }}</span>
     </button>
-    <div
-      class="dropdown__menu"
-      role="listbox"
-      v-show="isOpen"
-    >
+
+    <div v-show="isOpen" class="dropdown__menu" role="listbox">
       <button
+        v-for="option in options"
+        :key="option.value"
         class="dropdown__item"
-        :class="{'dropdown__item_icon': iconPresent}"
+        :class="{ dropdown__item_icon: hasIcons }"
         role="option"
         type="button"
-        v-for="option in options"
-        @click="$emit('update:modelValue', option.value)"
+        @click="select(option.value)"
       >
-        <UiIcon
-          v-if="option.icon"
-          :icon="option.icon"
-          class="dropdown__icon"
-        />
+        <UiIcon v-if="option.icon" :icon="option.icon" class="dropdown__icon" />
         {{ option.text }}
       </button>
     </div>
+
+    <select v-model="selectModel" :name="name" style="display: none">
+      <option v-for="option in options" :key="option.value" :value="option.value">{{ option.text }}</option>
+    </select>
   </div>
 </template>
 
@@ -46,41 +32,67 @@ import UiIcon from './UiIcon.vue';
 export default {
   name: 'UiDropdown',
 
-  components: {UiIcon},
+  components: { UiIcon },
+
   props: {
+    modelValue: {},
+
     options: {
-      required: true,
       type: Array,
-    },
-    modelValue: {
-      type: String
-    },
-    title: {
       required: true,
-      type: String
-    }
+      validator: (options) =>
+        options.every(
+          (option) => typeof option === 'object' && option !== null && 'value' in option && 'text' in option,
+        ),
+    },
+
+    title: {
+      type: String,
+      required: true,
+    },
+
+    name: {
+      type: String,
+    },
   },
+
   emits: ['update:modelValue'],
+
   data() {
     return {
-      isOpen: false
-    }
+      isOpen: false,
+    };
   },
-  computed: {
-    iconPresent(){
-      return this.options.some(option => !!option.icon)
-    },
-    optionActive() {
-      if (this.options.map(option => option.value).includes(this.modelValue)) {
-        return this.options.find(option => option.value === this.modelValue)
-      } else {
-        return {
-          text: this.title,
-          icon: null
-        }
-      }
 
-    }
+  computed: {
+    selected() {
+      return this.options.find((option) => option.value === this.modelValue);
+    },
+
+    hasIcons() {
+      return this.options.some((option) => option.icon);
+    },
+
+    selectModel: {
+      get() {
+        return this.modelValue;
+      },
+
+      set(value) {
+        this.select(value);
+      },
+    },
+  },
+
+  methods: {
+    toggleOpen() {
+      this.isOpen = !this.isOpen;
+    },
+
+    select(value) {
+      this.isOpen = false;
+      this.$emit('update:modelValue', value);
+    },
   },
 };
 </script>
@@ -89,10 +101,11 @@ export default {
 .dropdown {
   position: relative;
   display: inline-block;
+  width: 100%;
 }
 
 .dropdown__toggle {
-  display: inline-block;
+  display: inline-flex;
   background-color: var(--white);
   background-position: calc(100% - 10px) calc(100% - 10px);
   border: 2px solid var(--blue-light);
@@ -110,7 +123,7 @@ export default {
   box-shadow: none;
   cursor: pointer;
   text-decoration: none;
-  width: 300px;
+  width: 100%;
 }
 
 .dropdown__toggle:after {
@@ -127,7 +140,7 @@ export default {
   transition: 0.2s transform;
 }
 
-.dropdown__toggle_icon {
+.dropdown__toggle.dropdown__toggle_icon {
   padding-left: 56px;
 }
 
@@ -143,24 +156,29 @@ export default {
 }
 
 .dropdown__menu {
-  background-clip: padding-box;
+  margin: 0;
+  width: 100%;
+  padding: 0;
   border-radius: 0 0 8px 8px;
+  left: 0;
+  z-index: 95;
+  background-clip: padding-box;
+  display: none;
+  flex-direction: column;
   border: 2px solid var(--blue);
   border-top: none;
-  bottom: auto;
-  display: flex;
-  flex-direction: column;
-  left: 0;
-  margin: 0;
   overflow: hidden;
-  padding: 0;
+}
+
+.dropdown_opened .dropdown__menu {
+  display: flex;
   position: absolute;
-  right: auto;
-  top: -1px;
   transform: translate3d(0px, 52px, 0px);
-  width: 100%;
+  top: -1px;
+  left: 0;
   will-change: transform;
-  z-index: 95;
+  right: auto;
+  bottom: auto;
 }
 
 .dropdown__item {
@@ -184,12 +202,12 @@ export default {
   background-color: var(--grey-light);
 }
 
-.dropdown__item_icon {
+.dropdown__item.dropdown__item_icon {
   padding-left: 56px;
   position: relative;
 }
 
-.dropdown__item_icon .dropdown__icon,
+.dropdown__item.dropdown__item_icon .dropdown__icon,
 .dropdown__toggle_icon .dropdown__icon {
   position: absolute;
   top: 50%;
