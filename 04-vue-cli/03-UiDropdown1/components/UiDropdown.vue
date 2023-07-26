@@ -110,6 +110,7 @@ export default {
   box-shadow: none;
   cursor: pointer;
   text-decoration: none;
+  width: 300px;
 }
 
 .dropdown__toggle:after {
