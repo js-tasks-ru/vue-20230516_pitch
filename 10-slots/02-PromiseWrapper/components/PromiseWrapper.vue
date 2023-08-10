@@ -1,15 +1,8 @@
 <template>
   <Transition name="fade" mode="out-in">
-    <template v-if="result">
-      <slot name="fulfilled" :result="result" key="fulfilled"/>
-    </template>
-    <template v-else-if="error">
-      <slot name="rejected" :error="error" key="rejected"/>
-    </template>
-
-    <template v-else>
-      <slot name="pending" key="pending"/>
-    </template>
+      <slot v-if="result" name="fulfilled" :result="result" key="fulfilled"/>
+      <slot v-else-if="error" name="rejected" :error="error" key="rejected"/>
+      <slot v-else name="pending" key="pending"/>
   </Transition>
 
 </template>
