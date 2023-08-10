@@ -4,7 +4,6 @@
       <slot v-else-if="error" name="rejected" :error="error" key="rejected"/>
       <slot v-else name="pending" key="pending"/>
   </Transition>
-
 </template>
 
 <script>
@@ -17,12 +16,14 @@ export default {
       required: true,
     },
   },
+
   data() {
     return {
       result: null,
       error: null,
     };
   },
+
   watch: {
     promise: {
       immediate: true,
@@ -40,6 +41,7 @@ export default {
   }
 };
 </script>
+
 <style scoped>
 .fade-enter-active,
 .fade-leave-active {
