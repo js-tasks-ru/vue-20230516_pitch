@@ -1,6 +1,11 @@
 <template>
   <UiCalendarView v-slot="{date}">
-    <UiCalendarEvent v-for="meetup in meetupsFilter(date)" tag="a" :href="`/meetups/${meetup.id}`" :key="meetup.id">
+    <UiCalendarEvent
+      v-for="meetup in internationalMeetupsMap?.[date.fullYear]?.[date.month]?.[date.date]"
+      tag="a"
+      :key="meetup.id"
+      :href="`/meetups/${meetup.id}`"
+    >
       {{ meetup.title }}
     </UiCalendarEvent>
   </UiCalendarView>
@@ -24,13 +29,21 @@ export default {
       required: true,
     },
   },
-  methods: {
-    meetupsFilter(date) {
-      return this.meetups.filter(meetup => {
+  computed: {
+    internationalMeetupsMap() {
+      let result = {}
+      this.meetups.forEach(meetup => {
         const dateMeetups = new Date(meetup.date)
-        return date.date === dateMeetups.getDate() && date.month === dateMeetups.getMonth() && date.fullYear === dateMeetups.getFullYear()
+        const year = dateMeetups.getFullYear()
+        const month = dateMeetups.getMonth()
+        const date = dateMeetups.getDate()
+        result = {...result}
+        result[year] = {...result[year]}
+        result[year][month] = {...result[year][month]}
+        result[year][month][date] = {...result[year][month][date], [meetup.id]: meetup}
       })
-    }
+      return result;
+    },
   }
 };
 </script>

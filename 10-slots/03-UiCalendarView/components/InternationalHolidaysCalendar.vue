@@ -1,7 +1,11 @@
 <template>
   <UiCalendarView v-slot="{date}">
-    <div v-for="holiday in holidaysFilter(date)" :key="holiday.holiday" class="holiday">
-      {{ holiday.holiday }}
+    <div
+      v-for="holiday in internationalHolidaysMap[date.month][date.date]"
+      :key="holiday.holiday"
+      class="holiday"
+    >
+      {{ holiday }}
     </div>
   </UiCalendarView>
 </template>
@@ -59,29 +63,22 @@ export default {
       ],
     };
   },
-  methods: {
-    holidaysFilter(date) {
-      return this.internationalHolidays.filter(holiday => {
-        return date.date === holiday.date && date.month === holiday.month - 1
-      })
-    }
-  },
   computed: {
     // Для удобства можно создать вычисляемое свойство, которое приводит массив с данными к удобному виду
     // Например, здесь создаётся массив 12 объектов (по одному на каждый месяц от 0 до 11)
     // В каждом объекте поле - это день, а значение - массив праздников в этот день
-    // internationalHolidaysMap() {
-    //   const result = Array.from(Array(12), () => ({}));
-    //   for (const { date, month, holiday } of this.internationalHolidays) {
-    //     const jsMonth = month - 1;
-    //     if (!result[jsMonth][date]) {
-    //       result[jsMonth][date] = [holiday];
-    //     } else {
-    //       result[jsMonth][date].push(holiday);
-    //     }
-    //   }
-    //   return result;
-    // },
+    internationalHolidaysMap() {
+      const result = Array.from(Array(12), () => ({}));
+      for (const { date, month, holiday } of this.internationalHolidays) {
+        const jsMonth = month - 1;
+        if (!result[jsMonth][date]) {
+          result[jsMonth][date] = [holiday];
+        } else {
+          result[jsMonth][date].push(holiday);
+        }
+      }
+      return result;
+    },
   },
 };
 </script>
